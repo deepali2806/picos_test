@@ -64,7 +64,9 @@ module Make () : S = struct
                 begin
                   Atomic.incr suspend_count;
                   dequeue ()       
-                end       
+                end   
+              else
+                continue k (Obj.magic ())    
               )
           | e -> None }
     in

@@ -5,7 +5,7 @@ open Fun_queue
 
 type 'a mv_state =
   | Full  of 'a * ('a * Trigger.t) Fun_queue.t
-  | Empty of Trigger.t Fun_queue.t
+  | Empty of (Trigger.t) Fun_queue.t
 
 type 'a t = 'a mv_state Atomic.t
 
@@ -59,6 +59,8 @@ let rec put v mv =
               if Atomic.compare_and_set mv old_contents new_contents then 
                 begin
                   printf "Mvar put: Adding to list now \n";
+                  
+                  (* Hashtbl.add hashtable resume_trigger (Obj.magic v); *)
                   triggerlist := add !triggerlist (resume_trigger, (Obj.magic v));
                   printf "Mvar put: Signaling now \n";
                   Trigger.signal resume_trigger
@@ -78,6 +80,7 @@ let rec take mv =
                   printf "Mvar take: Before await\n";
                   match Trigger.await t with
                         | None -> (printf "Mvar take: Resumed already\n"; 
+                                  (* Obj.magic (Hashtbl.find hashtable t) *)
                                   let v = find !triggerlist t in 
                                   printf "Mvar take: Finally done\n"; 
                                   (Obj.magic v)
