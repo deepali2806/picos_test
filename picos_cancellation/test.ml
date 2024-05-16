@@ -21,8 +21,7 @@ let main () =
 
       let fiber2 = F.fork (fun _ ->
           Printf.printf "Sched 1 : Fiber 2\n%!";
-          (* Unix.sleep 2; *)
-        let 
+          Unix.sleep 2;
         let v = 42 in
         Printf.printf "Sched 2: Thread in Fifo scheduler2 putting %d into MVar\n%!" v;
         MVar.put v m;

@@ -45,7 +45,6 @@ let suspend_count = Atomic.make 0
                 begin
                   printf "Sched: A thread has been cancelled\n%!";
                   (* Do resource cleanup before discontinuing *)
-                  if Fiber.
                   try discontinue tasks.k Exit with
                   | Exit -> dequeue ()
                 end
