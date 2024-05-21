@@ -3,6 +3,7 @@ open Effect
 open Effect.Deep
 open Picos
 
+module Queue = Saturn.Queue
 module type S = sig
   val fork : (unit -> unit) -> Fiber.t
   val yield : unit -> unit
@@ -22,7 +23,7 @@ let suspend_count = Atomic.make 0
   let run main =
     let run_q = Queue.create () in
     let enqueue (t: 'a task) =
-      Queue.push t run_q;
+      Queue.push run_q t;
     in
     let rec dequeue () =
       if (Queue.is_empty run_q) then
@@ -36,7 +37,9 @@ let suspend_count = Atomic.make 0
         begin
           if (not (Queue.is_empty run_q)) then
             begin
-              let tasks = Queue.pop run_q in
+              let tasks = 
+              match Queue.pop run_q  with
+              | Some task -> task in
               (if not (Fiber.is_canceled tasks.fiber) then
                 begin
                   continue tasks.k ()
